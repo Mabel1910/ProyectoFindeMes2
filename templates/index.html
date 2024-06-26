@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modelo de Predicción</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        function predecir(event) {
+            event.preventDefault();
+            const km = document.getElementById('km').value;
+            const onRoadNow = document.getElementById('onRoadNow').value;
+            const onRoadOld = document.getElementById('onRoadOld').value;
+            const condition = document.getElementById('condition').value;
+            const torque = document.getElementById('torque').value;
+            const topSpeed = document.getElementById('topSpeed').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `km=${km}&on_road_now=${onRoadNow}&on_road_old=${onRoadOld}&condition=${condition}&torque=${torque}&top_speed=${topSpeed}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('resultado').innerText = 'Error: ' + data.error;
+                } else {
+                    document.getElementById('resultado').innerText = 'La predicción es: ' + data.categoria;
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultado').innerText = 'Error en la solicitud.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Modelo de Predicción</h1>
+    <form id="formulario" onsubmit="predecir(event)">
+        <label for="km">KM:</label>
+        <input type="text" id="km" name="km"><br><br>
+        <label for="onRoadNow">On Road Now:</label>
+        <input type="text" id="onRoadNow" name="onRoadNow"><br><br>
+        <label for="onRoadOld">On Road Old:</label>
+        <input type="text" id="onRoadOld" name="onRoadOld"><br><br>
+        <label for="condition">Condition:</label>
+        <input type="text" id="condition" name="condition"><br><br>
+        <label for="torque">Torque:</label>
+        <input type="text" id="torque" name="torque"><br><br>
+        <label for="topSpeed">Top Speed:</label>
+        <input type="text" id="topSpeed" name="topSpeed"><br><br>
+        <input type="submit" value="Enviar">
+    </form>
+    
+    <p id="resultado"></p>
+</body>
+</html>
